@@ -5,12 +5,24 @@ export class Player {
         this.game = game;
         this.x = game.canvas.width / (2 * game.scaleFactor);
         this.y = game.canvas.height / (2 * game.scaleFactor);
-        this.size = 30;
+        this.width = 50;
+        this.height = 50;
         this.speed = 5;
-        this.color = '#3498db';
         this.health = 100;
         this.score = 0;
         this.lastShot = 0;
+        this.image = new Image();
+        this.imageLoaded = false;
+        
+        this.image.src = 'images/player.png';
+        this.image.onload = () => {
+            this.imageLoaded = true;
+            document.querySelector('.preloader').style.display = 'none';
+        };
+        this.image.onerror = () => {
+            console.error('Failed to load player image');
+            this.imageLoaded = false;
+        };
     }
 
     update() {
@@ -21,10 +33,20 @@ export class Player {
     }
 
     draw(ctx) {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
+        if (this.imageLoaded) {
+            ctx.drawImage(
+                this.image,
+                this.x - this.width/2,
+                this.y - this.height/2,
+                this.width,
+                this.height
+            );
+        } else {
+            ctx.fillStyle = '#3498db';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.width/2, 0, Math.PI * 2);
+            ctx.fill();
+        }
     }
 
     autoShoot() {
@@ -54,6 +76,6 @@ export class Player {
     }
 
     checkCollision(target) {
-        return Math.hypot(this.x - target.x, this.y - target.y) < this.size + target.size;
+        return Math.hypot(this.x - target.x, this.y - target.y) < this.width/2 + target.size;
     }
 }

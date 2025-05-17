@@ -43,20 +43,16 @@ export class Game {
     update() {
         this.player.update();
         
-        // Spawn enemies
         if (Date.now() - this.lastEnemySpawn > 2000) {
             this.enemies.push(spawnEnemy(this));
             this.lastEnemySpawn = Date.now();
         }
 
-        // Update entities
         this.enemies.forEach(enemy => enemy.update());
         this.bullets.forEach(bullet => bullet.update());
 
-        // Remove out of bounds bullets
         this.bullets = this.bullets.filter(bullet => !bullet.isOutOfBounds());
 
-        // Check collisions
         this.checkCollisions();
         updateUI(this);
     }
@@ -69,7 +65,6 @@ export class Game {
     }
 
     checkCollisions() {
-        // Bullet-enemy collisions
         this.bullets = this.bullets.filter(bullet => {
             return !this.enemies.some((enemy, index) => {
                 if (bullet.checkCollision(enemy)) {
@@ -81,7 +76,6 @@ export class Game {
             });
         });
 
-        // Player-enemy collisions
         this.enemies.forEach(enemy => {
             if (this.player.checkCollision(enemy)) {
                 this.player.health -= 0.5;

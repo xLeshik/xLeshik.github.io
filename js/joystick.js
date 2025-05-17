@@ -7,15 +7,12 @@ export function initJoystick(game) {
     let activeTouchId = null;
     let lastDirection = { x: 0, y: 0 };
 
-    // Оптимизация для предотвращения скролла страницы
     document.addEventListener('touchmove', e => {
         if (joystickActive) e.preventDefault();
     }, { passive: false });
 
     document.addEventListener('touchstart', e => {
         if (game.gamePaused) return;
-        
-        // Игнорируем касания в верхней зоне (где кнопки UI)
         if (e.touches[0].clientY < 100) return;
         
         const touch = e.touches[0];
@@ -32,7 +29,6 @@ export function initJoystick(game) {
     document.addEventListener('touchmove', e => {
         if (!joystickActive || game.gamePaused) return;
         
-        // Находим наш касание по идентификатору
         const touch = Array.from(e.touches).find(t => t.identifier === activeTouchId);
         if (!touch) return;
 
@@ -41,7 +37,6 @@ export function initJoystick(game) {
         const distance = Math.hypot(dx, dy);
         const maxDist = 50;
 
-        // Ограничиваем радиус джойстика
         const angle = Math.atan2(dy, dx);
         const effectiveDistance = Math.min(distance, maxDist);
         
@@ -53,7 +48,6 @@ export function initJoystick(game) {
         joystickInner.style.left = `${joystickPosition.x - joystickCenter.x}px`;
         joystickInner.style.top = `${joystickPosition.y - joystickCenter.y}px`;
 
-        // Сохраняем направление для плавного движения
         lastDirection = {
             x: dx / distance,
             y: dy / distance
@@ -69,15 +63,13 @@ export function initJoystick(game) {
         }
     });
 
-    // Обновляем движение игрока в игровом цикле
     game.player.updateWithJoystick = function() {
         if (joystickActive) {
             this.x += lastDirection.x * this.speed;
             this.y += lastDirection.y * this.speed;
             
-            // Ограничиваем игрока в пределах canvas
-            this.x = Math.max(this.size, Math.min(this.x, game.canvas.width/game.scaleFactor - this.size));
-            this.y = Math.max(this.size, Math.min(this.y, game.canvas.height/game.scaleFactor - this.size));
+            this.x = Math.max(this.width/2, Math.min(this.x, game.canvas.width/game.scaleFactor - this.width/2));
+            this.y = Math.max(this.height/2, Math.min(this.y, game.canvas.height/game.scaleFactor - this.height/2));
         }
     };
 }

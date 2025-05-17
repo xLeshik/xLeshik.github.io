@@ -1,7 +1,6 @@
 import { Game } from './game.js';
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Запрашиваем полноэкранный режим при клике
     function requestFullscreen() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(err => {
