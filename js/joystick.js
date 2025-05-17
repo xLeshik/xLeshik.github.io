@@ -1,75 +1,112 @@
-export function initJoystick(game) {
-    const joystickOuter = document.getElementById('joystickOuter');
-    const joystickInner = document.getElementById('joystickInner');
-    let joystickActive = false;
-    let joystickCenter = { x: 0, y: 0 };
-    let joystickPosition = { x: 0, y: 0 };
-    let activeTouchId = null;
-    let lastDirection = { x: 0, y: 0 };
+(function() {
+    /**
+     * Инициализация джойстика
+     * @param {Game} game - экземпляр игры
+     */
+    function initJoystick(game) {
+        const joystickOuter = document.getElementById('joystickOuter');
+        const joystickInner = document.getElementById('joystickInner');
+        let active = false;
+        let touchId = null;
+        const maxDistance = 40;
 
-    document.addEventListener('touchmove', e => {
-        if (joystickActive) e.preventDefault();
-    }, { passive: false });
-
-    document.addEventListener('touchstart', e => {
-        if (game.gamePaused) return;
-        if (e.touches[0].clientY < 100) return;
-        
-        const touch = e.touches[0];
-        activeTouchId = touch.identifier;
-        joystickCenter = { x: touch.clientX, y: touch.clientY };
-        joystickPosition = { ...joystickCenter };
-        
-        joystickOuter.style.display = 'block';
-        joystickOuter.style.left = `${joystickCenter.x}px`;
-        joystickOuter.style.top = `${joystickCenter.y}px`;
-        joystickActive = true;
-    });
-
-    document.addEventListener('touchmove', e => {
-        if (!joystickActive || game.gamePaused) return;
-        
-        const touch = Array.from(e.touches).find(t => t.identifier === activeTouchId);
-        if (!touch) return;
-
-        const dx = touch.clientX - joystickCenter.x;
-        const dy = touch.clientY - joystickCenter.y;
-        const distance = Math.hypot(dx, dy);
-        const maxDist = 50;
-
-        const angle = Math.atan2(dy, dx);
-        const effectiveDistance = Math.min(distance, maxDist);
-        
-        joystickPosition = {
-            x: joystickCenter.x + Math.cos(angle) * effectiveDistance,
-            y: joystickCenter.y + Math.sin(angle) * effectiveDistance
-        };
-
-        joystickInner.style.left = `${joystickPosition.x - joystickCenter.x}px`;
-        joystickInner.style.top = `${joystickPosition.y - joystickCenter.y}px`;
-
-        lastDirection = {
-            x: dx / distance,
-            y: dy / distance
-        };
-    });
-
-    document.addEventListener('touchend', (e) => {
-        if (e.changedTouches[0].identifier === activeTouchId) {
-            joystickActive = false;
-            joystickOuter.style.display = 'none';
-            activeTouchId = null;
-            lastDirection = { x: 0, y: 0 };
-        }
-    });
-
-    game.player.updateWithJoystick = function() {
-        if (joystickActive) {
-            this.x += lastDirection.x * this.speed;
-            this.y += lastDirection.y * this.speed;
+        function handleStart(e) {
+            if (active) return;
             
-            this.x = Math.max(this.width/2, Math.min(this.x, game.canvas.width/game.scaleFactor - this.width/2));
-            this.y = Math.max(this.height/2, Math.min(this.y, game.canvas.height/game.scaleFactor - this.height/2));
+            const touch = getTouch(e);
+            if (!touch) return;
+            
+            active = true;
+            touchId = touch.identifier;
+            
+            joystickOuter.style.display = 'block';
+            joystickOuter.style.left = touch.clientX + 'px';
+            joystickOuter.style.top = touch.clientY + 'px';
+            
+            e.preventDefault();
         }
-    };
-}
+
+        function handleMove(e) {
+            if (!active) return;
+            
+            const touch = getTouch(e, touchId);
+            if (!touch) return;
+            
+            const outerRect = joystickOuter.getBoundingClientRect();
+            const centerX = outerRect.left + outerRect.width/2;
+            const centerY = outerRect.top + outerRect.height/2;
+            
+            let dx = touch.clientX - centerX;
+            let dy = touch.clientY - centerY;
+            const distance = Math.sqrt(dx*dx + dy*dy);
+            
+            if (distance > maxDistance) {
+                dx = dx * maxDistance / distance;
+                dy = dy * maxDistance / distance;
+            }
+            
+            joystickInner.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)`;
+            
+            // Обновляем направление игрока
+            if (distance > 10) {
+                game.player.direction.x = dx / maxDistance;
+                game.player.direction.y = dy / maxDistance;
+            } else {
+                game.player.direction.x = 0;
+                game.player.direction.y = 0;
+            }
+            
+            e.preventDefault();
+        }
+
+        function handleEnd() {
+            if (!active) return;
+            
+            active = false;
+            touchId = null;
+            joystickOuter.style.display = 'none';
+            game.player.direction.x = 0;
+            game.player.direction.y = 0;
+        }
+
+        function getTouch(e, id) {
+            if (e.touches) {
+                for (let i = 0; i < e.touches.length; i++) {
+                    if (id === undefined || e.touches[i].identifier === id) {
+                        return e.touches[i];
+                    }
+                }
+                return null;
+            } else {
+                return e;
+            }
+        }
+
+        // Обработчики для сенсорных устройств
+        document.addEventListener('touchstart', handleStart);
+        document.addEventListener('touchmove', handleMove);
+        document.addEventListener('touchend', handleEnd);
+        
+        // Обработчики для десктопа (для тестирования)
+        document.addEventListener('mousedown', handleStart);
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('mouseup', handleEnd);
+        
+        // Обработчик для стрельбы по тапу
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON') return;
+            
+            const rect = game.canvas.getBoundingClientRect();
+            const scaleX = game.canvas.width / game.scaleFactor / rect.width;
+            const scaleY = game.canvas.height / game.scaleFactor / rect.height;
+            
+            const x = (e.clientX - rect.left) * scaleX;
+            const y = (e.clientY - rect.top) * scaleY;
+            
+            game.player.shoot(x, y);
+        });
+    }
+
+    // Экспорт в глобальную область видимости
+    window.initJoystick = initJoystick;
+})();

@@ -1,92 +1,89 @@
-import { Player } from './player.js';
-import { Enemy, spawnEnemy } from './enemy.js';
-import { initJoystick } from './joystick.js';
-import { initUI, updateUI } from './ui.js';
-import { Bullet } from './bullet.js';
+function Game() {
+    this.canvas = document.getElementById('gameCanvas');
+    this.ctx = this.canvas.getContext('2d');
+    this.scaleFactor = window.devicePixelRatio > 1 ? 2 : 1;
+    this.player = null;
+    this.enemies = [];
+    this.bullets = [];
+    this.lastEnemySpawn = 0;
+    this.gameOver = false;
+    this.gamePaused = false;
+    this.animationFrameId = null;
+    this.background = new Image();
+}
 
-export class Game {
-    constructor() {
-        this.canvas = document.getElementById('gameCanvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.scaleFactor = window.devicePixelRatio > 1 ? 2 : 1;
-        this.player = null;
-        this.enemies = [];
-        this.bullets = [];
-        this.lastEnemySpawn = 0;
-        this.gameOver = false;
-        this.gamePaused = false;
-        this.animationFrameId = null;
-        this.background = new Image();
+Game.prototype.init = function() {
+    console.log('Game init');
+    this.setupCanvas();
+    
+    this.player = new Player(this);
+    initJoystick(this);
+    initUI(this);
+    
+    this.background.src = 'images/backbat.png';
+    this.background.onload = function() {
+        console.log('Background loaded');
+        this.startGameLoop();
+    }.bind(this);
+    
+    this.background.onerror = function() {
+        console.error('Background load error');
+        this.startGameLoop();
+    }.bind(this);
+};
+
+Game.prototype.startGameLoop = function() {
+    console.log('Starting game loop');
+    this.gameLoop();
+    window.addEventListener('resize', this.handleResize.bind(this));
+};
+
+Game.prototype.handleResize = function() {
+    this.setupCanvas();
+};
+
+Game.prototype.setupCanvas = function() {
+    this.canvas.width = window.innerWidth * this.scaleFactor;
+    this.canvas.height = window.innerHeight * this.scaleFactor;
+    this.ctx.scale(this.scaleFactor, this.scaleFactor);
+};
+
+Game.prototype.gameLoop = function() {
+    if (!this.gameOver && !this.gamePaused) {
+        this.update();
+        this.draw();
+    }
+    this.animationFrameId = requestAnimationFrame(this.gameLoop.bind(this));
+};
+
+Game.prototype.update = function() {
+    this.player.update();
+    
+    if (Date.now() - this.lastEnemySpawn > 2000) {
+        this.enemies.push(spawnEnemy(this));
+        this.lastEnemySpawn = Date.now();
     }
 
-    init() {
-        this.setupCanvas();
-        
-        // Инициализация игровых объектов
-        this.player = new Player(this);
-        initJoystick(this);
-        initUI(this);
-        
-        // Загрузка фона
-        this.background.src = 'images/backbat.png';
-        this.background.onload = () => {
-            this.startGameLoop();
-        };
-        this.background.onerror = () => {
-            console.error('Background image failed to load');
-            this.startGameLoop();
-        };
-    }
+    this.enemies.forEach(function(enemy) {
+        enemy.update();
+    });
+    
+    this.bullets.forEach(function(bullet) {
+        bullet.update();
+    });
 
-    startGameLoop() {
-        this.gameLoop();
-        window.addEventListener('resize', this.handleResize.bind(this));
-    }
+    this.bullets = this.bullets.filter(function(bullet) {
+        return !bullet.isOutOfBounds();
+    });
 
-    handleResize() {
-        this.setupCanvas();
-    }
+    this.checkCollisions();
+    updateUI(this);
+};
 
-    setupCanvas() {
-        this.canvas.width = window.innerWidth * this.scaleFactor;
-        this.canvas.height = window.innerHeight * this.scaleFactor;
-        this.ctx.scale(this.scaleFactor, this.scaleFactor);
-    }
-
-    gameLoop() {
-        if (!this.gameOver && !this.gamePaused) {
-            this.update();
-            this.draw();
-        }
-        this.animationFrameId = requestAnimationFrame(() => this.gameLoop());
-    }
-
-    update() {
-        this.player.update();
-        
-        // Спавн врагов
-        if (Date.now() - this.lastEnemySpawn > 2000) {
-            this.enemies.push(spawnEnemy(this));
-            this.lastEnemySpawn = Date.now();
-        }
-
-        // Обновление объектов
-        this.enemies.forEach(enemy => enemy.update());
-        this.bullets.forEach(bullet => bullet.update());
-
-        // Удаление пуль за пределами экрана
-        this.bullets = this.bullets.filter(bullet => !bullet.isOutOfBounds());
-
-        // Проверка коллизий
-        this.checkCollisions();
-        updateUI(this);
-    }
-
-    draw() {
-        // Очистка canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // Рисование фона
+Game.prototype.draw = function() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    if (this.background.complete) {
         this.ctx.drawImage(
             this.background,
             0,
@@ -94,48 +91,47 @@ export class Game {
             this.canvas.width / this.scaleFactor,
             this.canvas.height / this.scaleFactor
         );
-
-        // Рисование игровых объектов
-        this.player.draw(this.ctx);
-        this.enemies.forEach(enemy => enemy.draw(this.ctx));
-        this.bullets.forEach(bullet => bullet.draw(this.ctx));
     }
 
-    checkCollisions() {
-        // Коллизии пуль с врагами
-        this.bullets = this.bullets.filter(bullet => {
-            return !this.enemies.some((enemy, index) => {
-                if (bullet.checkCollision(enemy)) {
-                    this.enemies.splice(index, 1);
-                    this.player.score += 10;
-                    return true;
-                }
-                return false;
-            });
-        });
+    this.player.draw(this.ctx);
+    
+    this.enemies.forEach(function(enemy) {
+        enemy.draw(this.ctx);
+    }.bind(this));
+    
+    this.bullets.forEach(function(bullet) {
+        bullet.draw(this.ctx);
+    }.bind(this));
+};
 
-        // Коллизии игрока с врагами
-        this.enemies.forEach(enemy => {
-            if (this.player.checkCollision(enemy)) {
-                this.player.health -= 0.5;
-                if (this.player.health <= 0) {
-                    this.gameOver = true;
-                    alert(`Game Over! Score: ${this.player.score}`);
-                }
+Game.prototype.checkCollisions = function() {
+    this.bullets = this.bullets.filter(function(bullet) {
+        return !this.enemies.some(function(enemy, index) {
+            if (bullet.checkCollision(enemy)) {
+                this.enemies.splice(index, 1);
+                this.player.score += 10;
+                return true;
             }
-        });
-    }
+            return false;
+        }.bind(this));
+    }.bind(this));
 
-    destroy() {
-        // Остановка игрового цикла
-        cancelAnimationFrame(this.animationFrameId);
-        
-        // Удаление обработчиков событий
-        window.removeEventListener('resize', this.handleResize);
-        
-        // Очистка игровых объектов
-        this.player = null;
-        this.enemies = [];
-        this.bullets = [];
-    }
-}
+    this.enemies.forEach(function(enemy) {
+        if (this.player.checkCollision(enemy)) {
+            this.player.health -= 0.5;
+            if (this.player.health <= 0) {
+                this.gameOver = true;
+                alert('Game Over! Score: ' + this.player.score);
+            }
+        }
+    }.bind(this));
+};
+
+Game.prototype.destroy = function() {
+    console.log('Destroying game');
+    cancelAnimationFrame(this.animationFrameId);
+    window.removeEventListener('resize', this.handleResize);
+    this.player = null;
+    this.enemies = [];
+    this.bullets = [];
+};

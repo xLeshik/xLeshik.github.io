@@ -1,39 +1,68 @@
-export class Enemy {
-    constructor(x, y, game) {
+(function() {
+    /**
+     * Создание врага
+     * @param {Game} game - экземпляр игры
+     */
+    function spawnEnemy(game) {
+        // Случайная позиция за пределами экрана
+        let x, y;
+        if (Math.random() < 0.5) {
+            x = Math.random() < 0.5 ? -50 : game.canvas.width / game.scaleFactor + 50;
+            y = Math.random() * game.canvas.height / game.scaleFactor;
+        } else {
+            x = Math.random() * game.canvas.width / game.scaleFactor;
+            y = Math.random() < 0.5 ? -50 : game.canvas.height / game.scaleFactor + 50;
+        }
+
+        return new Enemy(game, x, y);
+    }
+
+    /**
+     * Класс врага
+     * @param {Game} game - экземпляр игры
+     * @param {number} x - начальная позиция X
+     * @param {number} y - начальная позиция Y
+     */
+    function Enemy(game, x, y) {
         this.game = game;
         this.x = x;
         this.y = y;
-        this.size = 25;
-        this.speed = 1.9 + Math.random() * 0.5;
-        this.color = '#f1c40f';
-        this.health = 3;
+        this.width = 30;
+        this.height = 30;
+        this.speed = 1 + Math.random() * 1;
+        this.health = 100;
     }
 
-    update() {
-        const angle = Math.atan2(
-            this.game.player.y - this.y,
-            this.game.player.x - this.x
+    /**
+     * Обновление состояния врага
+     */
+    Enemy.prototype.update = function() {
+        // Движение к игроку
+        const dx = this.game.player.x - this.x;
+        const dy = this.game.player.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance > 0) {
+            this.x += (dx / distance) * this.speed;
+            this.y += (dy / distance) * this.speed;
+        }
+    };
+
+    /**
+     * Отрисовка врага
+     * @param {CanvasRenderingContext2D} ctx - контекст рисования
+     */
+    Enemy.prototype.draw = function(ctx) {
+        ctx.fillStyle = 'red';
+        ctx.fillRect(
+            this.x - this.width/2,
+            this.y - this.height/2,
+            this.width,
+            this.height
         );
-        this.x += Math.cos(angle) * this.speed;
-        this.y += Math.sin(angle) * this.speed;
-    }
+    };
 
-    draw(ctx) {
-        ctx.fillStyle = this.color;
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fill();
-    }
-}
-
-export function spawnEnemy(game) {
-    const side = Math.floor(Math.random() * 4);
-    let x, y;
-    
-    if (side === 0) [x, y] = [Math.random() * game.canvas.width/game.scaleFactor, -30];
-    else if (side === 1) [x, y] = [game.canvas.width/game.scaleFactor + 30, Math.random() * game.canvas.height/game.scaleFactor];
-    else if (side === 2) [x, y] = [Math.random() * game.canvas.width/game.scaleFactor, game.canvas.height/game.scaleFactor + 30];
-    else [x, y] = [-30, Math.random() * game.canvas.height/game.scaleFactor];
-
-    return new Enemy(x, y, game);
-}
+    // Экспорт в глобальную область видимости
+    window.spawnEnemy = spawnEnemy;
+    window.Enemy = Enemy;
+})();
