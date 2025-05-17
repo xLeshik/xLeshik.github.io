@@ -15,20 +15,31 @@ class App {
         this.initGame();
     }
 
-    async preloadAssets() {
-        return new Promise((resolve) => {
-            // Здесь можно добавить реальную загрузку спрайтов
-            setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                resolve();
-            }, 500);
-        });
-    }
+    // В файле main.js обновим preloadAssets:
+async preloadAssets() {
+    const loadImage = (src) => new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+    });
 
-    initGame() {
+    try {
+        // Пример загрузки одного спрайта для проверки
+        await loadImage('assets/player/idle_0.png');
+        document.getElementById('loading').style.display = 'none';
+    } catch (error) {
+        console.error('Error loading assets:', error);
+        document.getElementById('loading').innerHTML = 
+            '<p style="color: red">Error loading game assets!</p>';
+    }
+}
+
+    async initGame() {
         this.game = new Game();
-        this.game.start();
+        await this.game.player.loadSprites();
         this.setupEventListeners();
+        this.game.start();
     }
 
     setupEventListeners() {

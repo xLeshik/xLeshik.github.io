@@ -22,95 +22,65 @@ export default class Player {
         this.animationSpeed = 0.2;
         this.frameTime = 0;
         this.sprites = {
-            idle: this.createSprites('idle', 4),
-            run: this.createSprites('run', 6),
-            jump: this.createSprites('jump', 2),
-            shoot: this.createSprites('shoot', 3)
+            idle: [],
+            run: [],
+            jump: [],
+            shoot: []
         };
-        this.state = 'idle';
+        this.spritesLoaded = false;
+
+        this.loadSprites();
     }
 
-    createSprites(state, count) {
-        const sprites = [];
-        for (let i = 0; i < count; i++) {
-            const img = new Image();
-            img.src = `assets/player/${state}_${i}.png`;
-            sprites.push(img);
-        }
-        return sprites;
-    }
-
-    update(deltaTime, keys) {
-        // Horizontal movement
-        let moveX = 0;
-        if (keys.left) {
-            moveX = -1;
-            this.direction = -1;
-            this.state = 'run';
-        } else if (keys.right) {
-            moveX = 1;
-            this.direction = 1;
-            this.state = 'run';
-        } else {
-            this.state = 'idle';
-        }
-        
-        this.x += moveX * this.speed * deltaTime;
-        
-        // Jump
-        if (keys.jump && this.isGrounded) {
-            this.velocityY = this.jumpForce;
-            this.isGrounded = false;
-            this.state = 'jump';
-        }
-        
-        // Apply gravity
-        this.velocityY += this.gravity * deltaTime;
-        this.y += this.velocityY * deltaTime;
-        
-        // Ground collision
-        if (this.y >= this.game.canvas.height - this.height - 50) {
-            this.y = this.game.canvas.height - this.height - 50;
-            this.velocityY = 0;
-            this.isGrounded = true;
-        }
-        
-        // Screen bounds
-        this.x = Math.max(0, Math.min(this.x, this.game.canvas.width - this.width));
-        
-        // Animation
-        this.frameTime += deltaTime;
-        if (this.frameTime >= this.animationSpeed) {
-            this.currentFrame = (this.currentFrame + 1) % this.sprites[this.state].length;
-            this.frameTime = 0;
-        }
-        
-        // Shoot cooldown
-        if (this.shootCooldown > 0) {
-            this.shootCooldown -= deltaTime;
+    async loadSprites() {
+        try {
+            this.sprites.idle = await this.loadSpriteSet('idle', 4);
+            this.sprites.run = await this.loadSpriteSet('run', 6);
+            this.sprites.jump = await this.loadSpriteSet('jump', 2);
+            this.sprites.shoot = await this.loadSpriteSet('shoot', 3);
+            this.spritesLoaded = true;
+        } catch (error) {
+            console.error('Error loading sprites:', error);
         }
     }
 
-    shoot() {
-        if (this.shootCooldown <= 0) {
-            this.state = 'shoot';
-            this.game.particles.createBulletFlash(
-                this.x + (this.direction > 0 ? this.width : 0),
-                this.y + this.height / 2,
-                this.direction
-            );
+    loadSpriteSet(state, count) {
+        return new Promise((resolve, reject) => {
+            const images = [];
+            let loaded = 0;
             
-            new Bullet(this.game, this.x + this.width/2, this.y + this.height/2, this.direction);
-            this.shootCooldown = 0.2;
-        }
+            for (let i = 0; i < count; i++) {
+                const img = new Image();
+                img.onload = () => {
+                    loaded++;
+                    if (loaded === count) resolve(images);
+                };
+                img.onerror = (err) => reject(`Error loading ${state}_${i}.png`);
+                img.src = `assets/player/${state}_${i}.png`;
+                images.push(img);
+            }
+        });
     }
 
     render(ctx) {
+        if (!this.spritesLoaded) {
+            // Отображаем заглушку до загрузки спрайтов
+            ctx.fillStyle = 'rgba(255,0,0,0.5)';
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            return;
+        }
+
+        const currentSprite = this.sprites[this.state]?.[this.currentFrame];
+        if (!currentSprite || !currentSprite.complete) {
+            console.error('Invalid sprite:', this.state, this.currentFrame);
+            return;
+        }
+
         ctx.save();
         if (this.direction < 0) {
             ctx.scale(-1, 1);
             ctx.drawImage(
-                this.sprites[this.state][this.currentFrame],
+                currentSprite,
                 -this.x - this.width,
                 this.y,
                 this.width,
@@ -118,7 +88,7 @@ export default class Player {
             );
         } else {
             ctx.drawImage(
-                this.sprites[this.state][this.currentFrame],
+                currentSprite,
                 this.x,
                 this.y,
                 this.width,

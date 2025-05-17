@@ -18,7 +18,9 @@ export default class Game {
     }
 
     init() {
+        console.log('Initializing player...');
         this.player = new Player(this);
+        console.log('Player initialized:', this.player);
         this.enemies = [];
         this.particles = new ParticleSystem();
         this.score = 0;
@@ -28,16 +30,21 @@ export default class Game {
     }
 
     resize() {
+        console.log('Resizing canvas:', window.innerWidth, window.innerHeight);
         this.canvas.width = window.innerWidth;
         this.canvas.height = window.innerHeight;
+        this.canvas.style.width = window.innerWidth + 'px';
+        this.canvas.style.height = window.innerHeight + 'px';
     }
 
-    start() {
+    async start() {
+        await this.player.loadSprites();
         this.lastTime = performance.now();
         this.gameLoop(this.lastTime);
     }
 
     gameLoop(time) {
+        try {
         const deltaTime = (time - this.lastTime) / 1000;
         this.lastTime = time;
 
@@ -45,7 +52,11 @@ export default class Game {
         this.render();
         
         requestAnimationFrame((t) => this.gameLoop(t));
+    } catch (error) {
+        console.error('Game loop error:', error);
+        alert(`Game error: ${error.message}`);
     }
+}
 
     update(deltaTime) {
         this.player.update(deltaTime, this.keys);
@@ -82,6 +93,7 @@ export default class Game {
         this.ctx.fillStyle = '#2d3436';
         this.ctx.fillRect(0, this.canvas.height - 50, this.canvas.width, 50);
         
+        console.log('Rendering player:', this.player);
         this.player.render(this.ctx);
         this.enemies.forEach(enemy => enemy.render(this.ctx));
         this.particles.render(this.ctx);

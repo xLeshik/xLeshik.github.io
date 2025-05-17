@@ -25,6 +25,7 @@ body {
     display: block;
     background: #222;
     image-rendering: pixelated;
+    border: 2px solid red !important;
 }
 
 .hud {
@@ -36,6 +37,17 @@ body {
     font-size: 14px;
     text-shadow: 1px 1px 1px #000;
     z-index: 100;
+}
+
+.player-debug {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    color: white;
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
+    border-radius: 5px;
+    font-family: monospace;
 }
 
 .controls {
