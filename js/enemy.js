@@ -5,7 +5,7 @@ export class Enemy {
         this.y = y;
         this.size = 25;
         this.speed = 1.9 + Math.random() * 0.5;
-        this.color = '#f1c40f';
+        this.color = 'rgba(241, 196, 15, 0.9)';
         this.health = 3;
     }
 

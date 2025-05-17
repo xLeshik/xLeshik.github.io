@@ -3,18 +3,23 @@ import { Bullet } from './bullet.js';
 export class Player {
     constructor(game) {
         this.game = game;
-        this.x = game.canvas.width / (2 * game.scaleFactor);
-        this.y = game.canvas.height / (2 * game.scaleFactor);
+        this.resetPosition();
         this.size = 30;
         this.speed = 5;
-        this.color = '#3498db';
+        this.color = 'rgba(52, 152, 219, 0.9)';
         this.health = 100;
         this.score = 0;
         this.lastShot = 0;
     }
 
+    resetPosition() {
+        this.x = this.game.canvas.width / (2 * this.game.scaleFactor);
+        this.y = this.game.canvas.height / (2 * this.game.scaleFactor);
+    }
+
     update() {
         this.autoShoot();
+        this.handleBoundaries();
     }
 
     draw(ctx) {
@@ -25,9 +30,8 @@ export class Player {
     }
 
     autoShoot() {
-        if (this.game.enemies.length === 0) return;
-        if (Date.now() - this.lastShot < 700) return;
-
+        if (this.game.enemies.length === 0 || Date.now() - this.lastShot < 700) return;
+        
         const nearestEnemy = this.game.enemies.reduce((closest, enemy) => {
             const dist = Math.hypot(this.x - enemy.x, this.y - enemy.y);
             return dist < closest.dist ? { enemy, dist } : closest;
@@ -48,6 +52,17 @@ export class Player {
             ));
             this.lastShot = Date.now();
         }
+    }
+
+    handleBoundaries() {
+        this.x = Math.max(this.size, Math.min(
+            this.game.canvas.width/this.game.scaleFactor - this.size, 
+            this.x
+        ));
+        this.y = Math.max(this.size, Math.min(
+            this.game.canvas.height/this.game.scaleFactor - this.size, 
+            this.y
+        ));
     }
 
     checkCollision(target) {

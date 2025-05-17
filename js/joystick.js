@@ -5,7 +5,7 @@ export function initJoystick(game) {
     let joystickCenter = { x: 0, y: 0 };
     let joystickPosition = { x: 0, y: 0 };
 
-    document.addEventListener('touchstart', e => {
+    const handleTouchStart = (e) => {
         if (game.gamePaused) return;
         const touch = e.touches[0];
         joystickCenter = { x: touch.clientX, y: touch.clientY };
@@ -15,9 +15,9 @@ export function initJoystick(game) {
         joystickOuter.style.left = `${joystickCenter.x}px`;
         joystickOuter.style.top = `${joystickCenter.y}px`;
         joystickActive = true;
-    });
+    };
 
-    document.addEventListener('touchmove', e => {
+    const handleTouchMove = (e) => {
         if (!joystickActive || game.gamePaused) return;
         const touch = Array.from(e.touches).find(t => 
             t.clientX === joystickPosition.x && 
@@ -38,14 +38,17 @@ export function initJoystick(game) {
         joystickInner.style.left = `${joystickPosition.x - joystickCenter.x}px`;
         joystickInner.style.top = `${joystickPosition.y - joystickCenter.y}px`;
 
-        // Update player position
         const speed = game.player.speed * (distance / 50);
         game.player.x += (dx / distance) * speed;
         game.player.y += (dy / distance) * speed;
-    });
+    };
 
-    document.addEventListener('touchend', () => {
+    const handleTouchEnd = () => {
         joystickActive = false;
         joystickOuter.style.display = 'none';
-    });
+    };
+
+    document.addEventListener('touchstart', handleTouchStart);
+    document.addEventListener('touchmove', handleTouchMove);
+    document.addEventListener('touchend', handleTouchEnd);
 }
