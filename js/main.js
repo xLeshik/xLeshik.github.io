@@ -1,43 +1,43 @@
 import { Game } from './game.js';
 
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
     const startGameBtn = document.getElementById('startGameBtn');
     const mainMenuBtn = document.getElementById('mainMenuBtn');
     const mainMenu = document.getElementById('mainMenu');
     const gameScreen = document.getElementById('gameScreen');
+    const gameOverlay = document.getElementById('gameOverlay');
     
-    let game;
+    let gameInstance = null;
 
-    function startGame() {
-        mainMenu.classList.add('hidden');
-        gameScreen.classList.remove('hidden');
+    function startNewGame() {
+        // Скрываем главное меню и показываем игровой экран
+        mainMenu.classList.remove('visible');
+        gameScreen.classList.add('visible');
         
-        game = new Game();
-        game.init();
+        // Создаем новую игру
+        gameInstance = new Game();
+        gameInstance.init();
     }
 
     function returnToMainMenu() {
-        document.getElementById('gameOverlay').classList.add('hidden');
-        gameScreen.classList.add('hidden');
-        mainMenu.classList.remove('hidden');
+        // Скрываем overlay и игровой экран
+        gameOverlay.classList.remove('visible');
+        gameScreen.classList.remove('visible');
         
-        if (game) {
-            game.destroy();
-            game = null;
+        // Показываем главное меню
+        mainMenu.classList.add('visible');
+        
+        // Уничтожаем текущую игру
+        if (gameInstance) {
+            gameInstance.destroy();
+            gameInstance = null;
         }
     }
 
-    startGameBtn.addEventListener('click', startGame);
+    // Обработчики событий
+    startGameBtn.addEventListener('click', startNewGame);
     mainMenuBtn.addEventListener('click', returnToMainMenu);
 
-    // Fullscreen mode
-    function requestFullscreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen().catch(err => {
-                console.error(`Error attempting to enable fullscreen: ${err.message}`);
-            });
-        }
-    }
-    
-    document.addEventListener('click', requestFullscreen);
+    // Показываем главное меню при загрузке
+    mainMenu.classList.add('visible');
 });

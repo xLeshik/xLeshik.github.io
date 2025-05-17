@@ -15,56 +15,36 @@ export class Game {
         this.lastEnemySpawn = 0;
         this.gameOver = false;
         this.gamePaused = false;
-        this.assetsLoaded = false;
-        this.assetsToLoad = 2; // Player image + background
-        this.assetsLoadedCount = 0;
-        this.background = new Image();
         this.animationFrameId = null;
-    }
-
-    assetLoaded() {
-        this.assetsLoadedCount++;
-        const progress = Math.floor((this.assetsLoadedCount / this.assetsToLoad) * 100);
-        document.getElementById('loadingProgress').style.width = `${progress}%`;
-        
-        if (this.assetsLoadedCount >= this.assetsToLoad) {
-            this.assetsLoaded = true;
-            setTimeout(() => {
-                document.querySelector('.preloader').style.opacity = '0';
-                setTimeout(() => {
-                    document.querySelector('.preloader').style.display = 'none';
-                    document.getElementById('mainMenu').classList.remove('hidden');
-                }, 300);
-            }, 500);
-        }
+        this.background = new Image();
     }
 
     init() {
         this.setupCanvas();
         
-        // Load background
-        this.background.src = 'images/backbat.png';
-        this.background.onload = () => {
-            this.assetLoaded();
-        };
-        this.background.onerror = () => {
-            console.error('Failed to load background image');
-            this.assetLoaded();
-        };
-
+        // Инициализация игровых объектов
         this.player = new Player(this);
         initJoystick(this);
         initUI(this);
         
-        this.gameLoop();
-        window.addEventListener('resize', () => this.setupCanvas());
+        // Загрузка фона
+        this.background.src = 'images/backbat.png';
+        this.background.onload = () => {
+            this.startGameLoop();
+        };
+        this.background.onerror = () => {
+            console.error('Background image failed to load');
+            this.startGameLoop();
+        };
     }
 
-    destroy() {
-        if (this.animationFrameId) {
-            cancelAnimationFrame(this.animationFrameId);
-        }
-        window.removeEventListener('resize', () => this.setupCanvas());
+    startGameLoop() {
+        this.gameLoop();
+        window.addEventListener('resize', this.handleResize.bind(this));
+    }
+
+    handleResize() {
+        this.setupCanvas();
     }
 
     setupCanvas() {
@@ -81,8 +61,32 @@ export class Game {
         this.animationFrameId = requestAnimationFrame(() => this.gameLoop());
     }
 
+    update() {
+        this.player.update();
+        
+        // Спавн врагов
+        if (Date.now() - this.lastEnemySpawn > 2000) {
+            this.enemies.push(spawnEnemy(this));
+            this.lastEnemySpawn = Date.now();
+        }
+
+        // Обновление объектов
+        this.enemies.forEach(enemy => enemy.update());
+        this.bullets.forEach(bullet => bullet.update());
+
+        // Удаление пуль за пределами экрана
+        this.bullets = this.bullets.filter(bullet => !bullet.isOutOfBounds());
+
+        // Проверка коллизий
+        this.checkCollisions();
+        updateUI(this);
+    }
+
     draw() {
-        // Draw background
+        // Очистка canvas
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // Рисование фона
         this.ctx.drawImage(
             this.background,
             0,
@@ -91,13 +95,14 @@ export class Game {
             this.canvas.height / this.scaleFactor
         );
 
-        // Draw entities
+        // Рисование игровых объектов
         this.player.draw(this.ctx);
         this.enemies.forEach(enemy => enemy.draw(this.ctx));
         this.bullets.forEach(bullet => bullet.draw(this.ctx));
     }
 
     checkCollisions() {
+        // Коллизии пуль с врагами
         this.bullets = this.bullets.filter(bullet => {
             return !this.enemies.some((enemy, index) => {
                 if (bullet.checkCollision(enemy)) {
@@ -109,6 +114,7 @@ export class Game {
             });
         });
 
+        // Коллизии игрока с врагами
         this.enemies.forEach(enemy => {
             if (this.player.checkCollision(enemy)) {
                 this.player.health -= 0.5;
@@ -118,5 +124,18 @@ export class Game {
                 }
             }
         });
+    }
+
+    destroy() {
+        // Остановка игрового цикла
+        cancelAnimationFrame(this.animationFrameId);
+        
+        // Удаление обработчиков событий
+        window.removeEventListener('resize', this.handleResize);
+        
+        // Очистка игровых объектов
+        this.player = null;
+        this.enemies = [];
+        this.bullets = [];
     }
 }

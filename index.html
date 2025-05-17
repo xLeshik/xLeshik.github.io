@@ -3,34 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#222">
     <title>Archero Game</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <div class="preloader">
-        <img src="images/Loading.png" alt="Loading" class="loading-image">
-        <div class="loading-bar">
-            <div class="loading-progress" id="loadingProgress"></div>
-        </div>
-    </div>
-
-    <div id="mainMenu" class="screen">
+    <div id="mainMenu" class="screen visible">
         <img src="images/backmain.png" class="background-image">
         <button id="startGameBtn" class="menu-btn">В БОЙ</button>
     </div>
 
-    <div id="gameScreen" class="screen hidden">
+    <div id="gameScreen" class="screen">
         <canvas id="gameCanvas"></canvas>
         <div id="health">Health: 100</div>
         <div id="score">Score: 0</div>
         <button id="pauseBtn">Pause</button>
     </div>
     
-    <div id="gameOverlay" class="screen hidden">
+    <div id="gameOverlay" class="screen">
         <div class="overlay-content">
             <button id="resumeBtn" class="pause-btn">Resume Game</button>
             <button id="mainMenuBtn" class="pause-btn">Main Menu</button>

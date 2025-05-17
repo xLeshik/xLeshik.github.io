@@ -6,16 +6,21 @@ export function initUI(game) {
 
     pauseBtn.addEventListener('click', () => {
         game.gamePaused = !game.gamePaused;
-        gameOverlay.classList.toggle('hidden', !game.gamePaused);
+        if (game.gamePaused) {
+            gameOverlay.classList.add('visible');
+        } else {
+            gameOverlay.classList.remove('visible');
+        }
     });
 
     resumeBtn.addEventListener('click', () => {
         game.gamePaused = false;
-        gameOverlay.classList.add('hidden');
+        gameOverlay.classList.remove('visible');
     });
 
     mainMenuBtn.addEventListener('click', () => {
-        gameOverlay.classList.add('hidden');
+        game.gamePaused = false;
+        gameOverlay.classList.remove('visible');
     });
 }
 
