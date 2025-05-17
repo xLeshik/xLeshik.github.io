@@ -28,26 +28,7 @@
         document.getElementById('score').textContent = `Score: ${game.player.score}`;
     }
 
-<<<<<<< HEAD
     // Экспорт в глобальную область видимости
     window.initUI = initUI;
     window.updateUI = updateUI;
 })();
-=======
-    resumeBtn.addEventListener('click', () => {
-        game.gamePaused = false;
-        gameOverlay.classList.add('hidden');
-    });
-
-    mainMenuBtn.addEventListener('click', () => {
-        game.gamePaused = false;
-        gameOverlay.classList.add('hidden');
-        // Возврат в главное меню обрабатывается в main.js
-    });
-}
-
-export function updateUI(game) {
-    document.getElementById('health').textContent = `Health: ${Math.floor(game.player.health)}`;
-    document.getElementById('score').textContent = `Score: ${game.player.score}`;
-}
->>>>>>> 51d78df38af49148ba66bd4e87d3814938161f5e
