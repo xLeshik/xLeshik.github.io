@@ -12,22 +12,7 @@ export class Player {
         this.score = 0;
         this.lastShot = 0;
         this.image = new Image();
-        this.imageLoaded = false;
-        
         this.image.src = 'images/player.png';
-        this.image.onload = () => {
-            this.imageLoaded = true;
-            if (typeof this.game.assetLoaded === 'function') {
-                this.game.assetLoaded();
-            }
-        };
-        this.image.onerror = () => {
-            console.error('Failed to load player image');
-            this.imageLoaded = false;
-            if (typeof this.game.assetLoaded === 'function') {
-                this.game.assetLoaded();
-            }
-        };
     }
 
     update() {
@@ -38,20 +23,13 @@ export class Player {
     }
 
     draw(ctx) {
-        if (this.imageLoaded) {
-            ctx.drawImage(
-                this.image,
-                this.x - this.width/2,
-                this.y - this.height/2,
-                this.width,
-                this.height
-            );
-        } else {
-            ctx.fillStyle = '#3498db';
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.width/2, 0, Math.PI * 2);
-            ctx.fill();
-        }
+        ctx.drawImage(
+            this.image,
+            this.x - this.width/2,
+            this.y - this.height/2,
+            this.width,
+            this.height
+        );
     }
 
     autoShoot() {

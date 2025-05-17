@@ -15,7 +15,9 @@ export function initUI(game) {
     });
 
     mainMenuBtn.addEventListener('click', () => {
+        game.gamePaused = false;
         gameOverlay.classList.add('hidden');
+        // Возврат в главное меню обрабатывается в main.js
     });
 }
 
