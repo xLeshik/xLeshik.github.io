@@ -15,14 +15,41 @@ export class Game {
         this.lastEnemySpawn = 0;
         this.gameOver = false;
         this.gamePaused = false;
+        this.assetsLoaded = false;
+        this.assetsToLoad = 1; // Только изображение игрока
+        this.assetsLoadedCount = 0;
     }
+
+    assetLoaded() {
+    this.assetsLoadedCount++;
+    const progress = Math.floor((this.assetsLoadedCount / this.assetsToLoad) * 100);
+    document.getElementById('loadingProgress').style.width = `${progress}%`;
+    
+    if (this.assetsLoadedCount >= this.assetsToLoad) {
+        this.assetsLoaded = true;
+        setTimeout(() => {
+            document.querySelector('.preloader').style.opacity = '0';
+            setTimeout(() => {
+                document.querySelector('.preloader').style.display = 'none';
+            }, 300);
+        }, 500);
+    }
+}
 
     init() {
         this.setupCanvas();
         this.player = new Player(this);
         initJoystick(this);
         initUI(this);
-        this.gameLoop();
+        
+        // Запускаем проверку готовности ресурсов
+        const checkAssets = setInterval(() => {
+            if (this.assetsLoaded) {
+                clearInterval(checkAssets);
+                this.gameLoop();
+            }
+        }, 100);
+        
         window.addEventListener('resize', () => this.setupCanvas());
     }
 

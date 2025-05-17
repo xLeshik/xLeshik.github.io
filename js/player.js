@@ -17,11 +17,16 @@ export class Player {
         this.image.src = 'images/player.png';
         this.image.onload = () => {
             this.imageLoaded = true;
-            document.querySelector('.preloader').style.display = 'none';
+            if (typeof this.game.assetLoaded === 'function') {
+                this.game.assetLoaded();
+            }
         };
         this.image.onerror = () => {
             console.error('Failed to load player image');
             this.imageLoaded = false;
+            if (typeof this.game.assetLoaded === 'function') {
+                this.game.assetLoaded();
+            }
         };
     }
 
