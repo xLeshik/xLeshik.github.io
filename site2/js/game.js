@@ -6,18 +6,19 @@ export default class Game {
     constructor() {
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
-        this.keys = {
-            left: false,
-            right: false,
-            jump: false,
-            shoot: false
-        };
+        this.keys = { /* ... */ };
+        
+        // Инициализация игрока сразу
+        this.player = new Player(this); 
         
         this.resize();
         this.init();
     }
 
     init() {
+        if (!this.player) {
+            throw new Error('Player not initialized!');
+        }
         console.log('Initializing player...');
         this.player = new Player(this);
         console.log('Player initialized:', this.player);
@@ -38,7 +39,10 @@ export default class Game {
     }
 
     async start() {
-        await this.player.loadSprites();
+        // Ждем загрузки спрайтов
+        await this.player.loadSprites(); 
+        
+        // Запускаем игровой цикл
         this.lastTime = performance.now();
         this.gameLoop(this.lastTime);
     }
