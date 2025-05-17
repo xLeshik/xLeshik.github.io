@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Archero Game</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <div id="health">Health: 100</div>
+    <div id="score">Score: 0</div>
+    <button id="pauseBtn">Pause</button>
+    
+    <div id="gameOverlay">
+        <button id="resumeBtn" class="pause-btn">Resume Game</button>
+    </div>
+    
+    <div id="joystickOuter">
+        <div id="joystickInner"></div>
+    </div>
+    
+    <div class="no-joystick-zone"></div>
+
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

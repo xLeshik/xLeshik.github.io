@@ -1,0 +1,108 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #222;
+    font-family: Arial, sans-serif;
+    touch-action: none;
+}
+
+canvas {
+    display: block;
+    background: #111;
+}
+
+#score, #health {
+    position: absolute;
+    color: white;
+    font-size: 18px;
+    user-select: none;
+    text-shadow: 1px 1px 2px black;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+#score {
+    top: 10px;
+    left: 10px;
+}
+
+#health {
+    top: 10px;
+    right: 10px;
+}
+
+#pauseBtn {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 8px 16px;
+    background: #5555ff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1001;
+    white-space: nowrap;
+}
+
+#joystickOuter {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 10;
+    pointer-events: none;
+}
+
+#joystickInner {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+}
+
+.no-joystick-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    z-index: 20;
+}
+
+#gameOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 1002;
+}
+
+.pause-btn {
+    padding: 12px 24px;
+    margin: 10px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#resumeBtn {
+    background: #4CAF50;
+    color: white;
+}
