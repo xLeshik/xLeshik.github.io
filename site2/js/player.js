@@ -14,15 +14,14 @@ export default class Player {
         this.maxHealth = 100;
         this.isGrounded = false;
         this.currentWeapon = 'pistol';
-        this.weapons = {
-            pistol: { damage: 10, fireRate: 500 },
-            shotgun: { damage: 25, fireRate: 1000 },
-            machinegun: { damage: 7, fireRate: 100 }
-        };
+        this.direction = 1; // 1 - вправо, -1 - влево
     }
 
     move(direction) {
         this.velocity.x = direction * this.speed;
+        if (direction !== 0) {
+            this.direction = direction;
+        }
     }
 
     jump() {

@@ -1,65 +1,43 @@
 export function initControls(game) {
-    const controls = {
+    const state = {
         left: false,
         right: false,
         jump: false,
         shoot: false
     };
 
-    // Touch Events
-    const handleTouch = (control, state) => {
-        return e => {
+    // Обработчики для кнопок
+    const setupButton = (element, control) => {
+        element.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            controls[control] = state;
-            if (control === 'shoot' && state) game.weaponSystem.shoot(0);
-        };
+            state[control] = true;
+        });
+        
+        element.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            state[control] = false;
+        });
     };
 
-    document.querySelector('.left').addEventListener('touchstart', handleTouch('left', true));
-    document.querySelector('.left').addEventListener('touchend', handleTouch('left', false));
-    document.querySelector('.right').addEventListener('touchstart', handleTouch('right', true));
-    document.querySelector('.right').addEventListener('touchend', handleTouch('right', false));
-    document.querySelector('.jump').addEventListener('touchstart', handleTouch('jump', true));
-    document.querySelector('.shoot').addEventListener('touchstart', handleTouch('shoot', true));
+    setupButton(document.querySelector('.left'), 'left');
+    setupButton(document.querySelector('.right'), 'right');
+    setupButton(document.querySelector('.jump'), 'jump');
+    setupButton(document.querySelector('.shoot'), 'shoot');
 
-    // Keyboard Events
-    const keyMap = {
-        ArrowLeft: 'left',
-        ArrowRight: 'right',
-        ArrowUp: 'jump',
-        Space: 'shoot'
+    // Обработка стрельбы
+    document.querySelector('.shoot').addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        game.weaponSystem.shoot(game.player.direction > 0 ? 0 : Math.PI);
+    });
+
+    // Игровой цикл управления
+    const updateControls = () => {
+        if (state.left) game.player.move(-1);
+        if (state.right) game.player.move(1);
+        if (state.jump) game.player.jump();
+        
+        requestAnimationFrame(updateControls);
     };
-
-    window.addEventListener('keydown', e => {
-        const control = keyMap[e.code];
-        if (control) {
-            controls[control] = true;
-            e.preventDefault();
-        }
-    });
-
-    window.addEventListener('keyup', e => {
-        const control = keyMap[e.code];
-        if (control) {
-            controls[control] = false;
-            e.preventDefault();
-        }
-    });
-
-    // Update player movement
-    setInterval(() => {
-        if (controls.left) game.player.move(-1);
-        if (controls.right) game.player.move(1);
-        if (controls.jump) game.player.jump();
-    }, 16);
-}
-
-export function saveProgress(level) {
-    if (window.Telegram.WebApp.initDataUnsafe.user) {
-        const userId = window.Telegram.WebApp.initDataUnsafe.user.id;
-        localStorage.setItem(`progress_${userId}`, JSON.stringify({
-            level,
-            timestamp: Date.now()
-        }));
-    }
+    
+    updateControls();
 }

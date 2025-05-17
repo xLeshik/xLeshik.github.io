@@ -5,30 +5,24 @@ const tg = window.Telegram.WebApp;
 
 class App {
     constructor() {
-        this.game = null;
+        this.game = new Game();
         this.init();
     }
 
-    init() {
+    async init() {
         tg.expand();
         tg.enableClosingConfirmation();
-        this.initGame();
+        await this.initGame();
     }
 
-    initGame() {
-        this.game = new Game();
+    async initGame() {
         initControls(this.game);
         this.game.start();
-        this.setupResizeHandler();
-    }
-
-    setupResizeHandler() {
-        window.addEventListener('resize', () => {
-            this.game.resizeCanvas();
-        });
+        window.addEventListener('resize', () => this.game.resizeCanvas());
     }
 }
 
-window.addEventListener('DOMContentLoaded', () => {
+// Запуск приложения после полной загрузки страницы
+document.addEventListener('DOMContentLoaded', () => {
     new App();
 });
