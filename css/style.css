@@ -32,11 +32,7 @@ body {
     z-index: -1;
 }
 
-<<<<<<< HEAD
 /* Main Menu */
-=======
-/* Main Menu Styles */
->>>>>>> 51d78df38af49148ba66bd4e87d3814938161f5e
 #mainMenu {
     flex-direction: column;
 }
