@@ -15,8 +15,11 @@
         this.direction = { x: 0, y: 0 };
         this.image = new Image();
         this.image.src = 'images/player.png';
+<<<<<<< HEAD
         this.lastShot = 0;
         this.shootCooldown = 300; // мс между выстрелами
+=======
+>>>>>>> 51d78df38af49148ba66bd4e87d3814938161f5e
     }
 
     /**
@@ -27,6 +30,7 @@
         this.x += this.direction.x * this.speed;
         this.y += this.direction.y * this.speed;
 
+<<<<<<< HEAD
         // Ограничение движения в пределах экрана
         this.x = Math.max(this.width/2, Math.min(this.game.canvas.width / this.game.scaleFactor - this.width/2, this.x));
         this.y = Math.max(this.height/2, Math.min(this.game.canvas.height / this.game.scaleFactor - this.height/2, this.y));
@@ -52,6 +56,31 @@
                 this.y - this.height/2,
                 this.width,
                 this.height
+=======
+    draw(ctx) {
+        ctx.drawImage(
+            this.image,
+            this.x - this.width/2,
+            this.y - this.height/2,
+            this.width,
+            this.height
+        );
+    }
+
+    autoShoot() {
+        if (this.game.enemies.length === 0) return;
+        if (Date.now() - this.lastShot < 700) return;
+
+        const nearestEnemy = this.game.enemies.reduce((closest, enemy) => {
+            const dist = Math.hypot(this.x - enemy.x, this.y - enemy.y);
+            return dist < closest.dist ? { enemy, dist } : closest;
+        }, { enemy: null, dist: Infinity }).enemy;
+
+        if (nearestEnemy) {
+            const angle = Math.atan2(
+                nearestEnemy.y - this.y,
+                nearestEnemy.x - this.x
+>>>>>>> 51d78df38af49148ba66bd4e87d3814938161f5e
             );
         }
     };
