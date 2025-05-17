@@ -1,22 +1,18 @@
 import { Game } from './game.js';
 
-class TelegramApp {
-    static init() {
-        if (window.Telegram?.WebApp) {
-            Telegram.WebApp.expand();
-            Telegram.WebApp.enableClosingConfirmation();
-            return {
-                platform: Telegram.WebApp.platform,
-                themeParams: Telegram.WebApp.themeParams,
-                viewport: Telegram.WebApp.viewportHeight
-            };
-        }
-        return null;
-    }
-}
-
 window.addEventListener('DOMContentLoaded', () => {
-    const tgData = TelegramApp.init();
-    const game = new Game(!!tgData);
-    game.init(tgData);
+    // Запрашиваем полноэкранный режим при клике
+    function requestFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(err => {
+                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+            });
+        }
+    }
+    
+    document.addEventListener('click', requestFullscreen);
+    document.addEventListener('touchstart', requestFullscreen, { once: true });
+
+    const game = new Game();
+    game.init();
 });

@@ -6,7 +6,7 @@ export class Bullet {
         this.dy = dy;
         this.speed = 7;
         this.size = 10;
-        this.color = 'rgba(231, 76, 60, 0.9)';
+        this.color = '#e74c3c';
         this.game = game;
     }
 
