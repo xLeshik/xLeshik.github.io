@@ -7,6 +7,14 @@ body {
     position: fixed;
     width: 100%;
     height: 100%;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    overscroll-behavior: none;
 }
 
 .screen {
@@ -32,13 +40,12 @@ body {
     z-index: -1;
 }
 
-/* Main Menu */
 #mainMenu {
     flex-direction: column;
 }
 
 .menu-btn {
-    padding: 15px 30px;
+    padding: 20px 40px;
     font-size: 24px;
     background: #ff5722;
     color: white;
@@ -47,9 +54,10 @@ body {
     cursor: pointer;
     z-index: 11;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    min-width: 120px;
+    min-height: 50px;
 }
 
-/* Game Screen */
 #gameScreen {
     justify-content: flex-start;
 }
@@ -59,6 +67,7 @@ canvas {
     width: 100%;
     height: 100%;
     background-color: #111;
+    touch-action: none;
 }
 
 #score, #health {
@@ -86,21 +95,19 @@ canvas {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    padding: 8px 16px;
+    padding: 12px 24px;
     background: #5555ff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     z-index: 1001;
+    font-size: 18px;
 }
 
-/* Overlay */
 #gameOverlay {
     background: rgba(0, 0, 0, 0.7);
     z-index: 1002;
-    justify-content: center;
-    align-items: center;
 }
 
 .overlay-content {
@@ -110,11 +117,13 @@ canvas {
 }
 
 .pause-btn {
-    padding: 12px 24px;
+    padding: 15px 30px;
     font-size: 20px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
+    min-width: 120px;
+    min-height: 50px;
 }
 
 #resumeBtn {
@@ -127,11 +136,10 @@ canvas {
     color: white;
 }
 
-/* Joystick */
 #joystickOuter {
     position: absolute;
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 50%;
     transform: translate(-50%, -50%);
@@ -142,8 +150,8 @@ canvas {
 
 #joystickInner {
     position: absolute;
-    width: 40px;
-    height: 40px;
+    width: 60px;
+    height: 60px;
     background: rgba(255, 255, 255, 0.5);
     border-radius: 50%;
     top: 50%;

@@ -1,14 +1,11 @@
 (function() {
-    /**
-     * Инициализация джойстика
-     * @param {Game} game - экземпляр игры
-     */
     function initJoystick(game) {
         const joystickOuter = document.getElementById('joystickOuter');
         const joystickInner = document.getElementById('joystickInner');
         let active = false;
         let touchId = null;
         const maxDistance = 40;
+        let joystickCenter = null;
 
         function handleStart(e) {
             if (active) return;
@@ -22,6 +19,18 @@
             joystickOuter.style.display = 'block';
             joystickOuter.style.left = touch.clientX + 'px';
             joystickOuter.style.top = touch.clientY + 'px';
+            
+            const rect = game.canvas.getBoundingClientRect();
+            const scaleX = game.canvas.width / game.scaleFactor / rect.width;
+            const scaleY = game.canvas.height / game.scaleFactor / rect.height;
+            
+            joystickCenter = {
+                x: (touch.clientX - rect.left) * scaleX,
+                y: (touch.clientY - rect.top) * scaleY
+            };
+            
+            game.player.joystickCenter = joystickCenter;
+            game.player.startAutoShooting();
             
             e.preventDefault();
         }
@@ -47,7 +56,6 @@
             
             joystickInner.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)`;
             
-            // Обновляем направление игрока
             if (distance > 10) {
                 game.player.direction.x = dx / maxDistance;
                 game.player.direction.y = dy / maxDistance;
@@ -67,6 +75,8 @@
             joystickOuter.style.display = 'none';
             game.player.direction.x = 0;
             game.player.direction.y = 0;
+            game.player.stopAutoShooting();
+            game.player.joystickCenter = null;
         }
 
         function getTouch(e, id) {
@@ -82,31 +92,13 @@
             }
         }
 
-        // Обработчики для сенсорных устройств
         document.addEventListener('touchstart', handleStart);
         document.addEventListener('touchmove', handleMove);
         document.addEventListener('touchend', handleEnd);
-        
-        // Обработчики для десктопа (для тестирования)
         document.addEventListener('mousedown', handleStart);
         document.addEventListener('mousemove', handleMove);
         document.addEventListener('mouseup', handleEnd);
-        
-        // Обработчик для стрельбы по тапу
-        document.addEventListener('click', function(e) {
-            if (e.target.tagName === 'BUTTON') return;
-            
-            const rect = game.canvas.getBoundingClientRect();
-            const scaleX = game.canvas.width / game.scaleFactor / rect.width;
-            const scaleY = game.canvas.height / game.scaleFactor / rect.height;
-            
-            const x = (e.clientX - rect.left) * scaleX;
-            const y = (e.clientY - rect.top) * scaleY;
-            
-            game.player.shoot(x, y);
-        });
     }
 
-    // Экспорт в глобальную область видимости
     window.initJoystick = initJoystick;
 })();

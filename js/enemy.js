@@ -1,10 +1,5 @@
 (function() {
-    /**
-     * Создание врага
-     * @param {Game} game - экземпляр игры
-     */
     function spawnEnemy(game) {
-        // Случайная позиция за пределами экрана
         let x, y;
         if (Math.random() < 0.5) {
             x = Math.random() < 0.5 ? -50 : game.canvas.width / game.scaleFactor + 50;
@@ -17,12 +12,6 @@
         return new Enemy(game, x, y);
     }
 
-    /**
-     * Класс врага
-     * @param {Game} game - экземпляр игры
-     * @param {number} x - начальная позиция X
-     * @param {number} y - начальная позиция Y
-     */
     function Enemy(game, x, y) {
         this.game = game;
         this.x = x;
@@ -33,11 +22,7 @@
         this.health = 100;
     }
 
-    /**
-     * Обновление состояния врага
-     */
     Enemy.prototype.update = function() {
-        // Движение к игроку
         const dx = this.game.player.x - this.x;
         const dy = this.game.player.y - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
@@ -48,10 +33,6 @@
         }
     };
 
-    /**
-     * Отрисовка врага
-     * @param {CanvasRenderingContext2D} ctx - контекст рисования
-     */
     Enemy.prototype.draw = function(ctx) {
         ctx.fillStyle = 'red';
         ctx.fillRect(
@@ -62,7 +43,6 @@
         );
     };
 
-    // Экспорт в глобальную область видимости
     window.spawnEnemy = spawnEnemy;
     window.Enemy = Enemy;
 })();

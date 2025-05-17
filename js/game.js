@@ -13,8 +13,12 @@ function Game() {
 }
 
 Game.prototype.init = function() {
-    console.log('Game init');
     this.setupCanvas();
+    
+    if (window.Telegram && window.Telegram.WebApp) {
+        Telegram.WebApp.expand();
+        document.documentElement.requestFullscreen().catch(e => console.log(e));
+    }
     
     this.player = new Player(this);
     initJoystick(this);
@@ -22,18 +26,15 @@ Game.prototype.init = function() {
     
     this.background.src = 'images/backbat.png';
     this.background.onload = function() {
-        console.log('Background loaded');
         this.startGameLoop();
     }.bind(this);
     
     this.background.onerror = function() {
-        console.error('Background load error');
         this.startGameLoop();
     }.bind(this);
 };
 
 Game.prototype.startGameLoop = function() {
-    console.log('Starting game loop');
     this.gameLoop();
     window.addEventListener('resize', this.handleResize.bind(this));
 };
@@ -128,9 +129,9 @@ Game.prototype.checkCollisions = function() {
 };
 
 Game.prototype.destroy = function() {
-    console.log('Destroying game');
     cancelAnimationFrame(this.animationFrameId);
     window.removeEventListener('resize', this.handleResize);
+    this.player.stopAutoShooting();
     this.player = null;
     this.enemies = [];
     this.bullets = [];

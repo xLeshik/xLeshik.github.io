@@ -1,8 +1,4 @@
 (function() {
-    /**
-     * Класс игрока
-     * @param {Game} game - экземпляр игры
-     */
     function Player(game) {
         this.game = game;
         this.x = game.canvas.width / 2 / game.scaleFactor;
@@ -16,26 +12,31 @@
         this.image = new Image();
         this.image.src = 'images/player.png';
         this.lastShot = 0;
-        this.shootCooldown = 300; // мс между выстрелами
+        this.shootCooldown = 300;
+        this.autoShootInterval = null;
+        this.maxDistanceFromCenter = 150;
+        this.joystickCenter = null;
     }
 
-    /**
-     * Обновление состояния игрока
-     */
     Player.prototype.update = function() {
-        // Движение игрока
         this.x += this.direction.x * this.speed;
         this.y += this.direction.y * this.speed;
 
-        // Ограничение движения в пределах экрана
+        if (this.joystickCenter) {
+            const dx = this.x - this.joystickCenter.x;
+            const dy = this.y - this.joystickCenter.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > this.maxDistanceFromCenter) {
+                this.x = this.joystickCenter.x + (dx / distance) * this.maxDistanceFromCenter;
+                this.y = this.joystickCenter.y + (dy / distance) * this.maxDistanceFromCenter;
+            }
+        }
+
         this.x = Math.max(this.width/2, Math.min(this.game.canvas.width / this.game.scaleFactor - this.width/2, this.x));
         this.y = Math.max(this.height/2, Math.min(this.game.canvas.height / this.game.scaleFactor - this.height/2, this.y));
     };
 
-    /**
-     * Отрисовка игрока
-     * @param {CanvasRenderingContext2D} ctx - контекст рисования
-     */
     Player.prototype.draw = function(ctx) {
         if (this.image.complete) {
             ctx.drawImage(
@@ -56,10 +57,6 @@
         }
     };
 
-    /**
-     * Проверка столкновения с другим объектом
-     * @param {Object} other - другой объект
-     */
     Player.prototype.checkCollision = function(other) {
         return (
             this.x < other.x + other.width &&
@@ -69,25 +66,18 @@
         );
     };
 
-    /**
-     * Стрельба
-     * @param {number} targetX - координата X цели
-     * @param {number} targetY - координата Y цели
-     */
     Player.prototype.shoot = function(targetX, targetY) {
         const now = Date.now();
         if (now - this.lastShot < this.shootCooldown) return;
 
         this.lastShot = now;
         
-        // Вычисляем направление выстрела
         const dx = targetX - this.x;
         const dy = targetY - this.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         const directionX = dx / distance;
         const directionY = dy / distance;
 
-        // Создаем пулю
         this.game.bullets.push(new Bullet(
             this.game,
             this.x,
@@ -97,6 +87,51 @@
         ));
     };
 
-    // Экспорт в глобальную область видимости
+    Player.prototype.startAutoShooting = function() {
+        if (this.autoShootInterval) return;
+        
+        this.autoShootInterval = setInterval(() => {
+            if (!this.game.gamePaused && !this.game.gameOver) {
+                const nearestEnemy = this.findNearestEnemy();
+                if (nearestEnemy) {
+                    this.shoot(nearestEnemy.x, nearestEnemy.y);
+                } else {
+                    const angle = Math.random() * Math.PI * 2;
+                    this.shoot(
+                        this.x + Math.cos(angle) * 100,
+                        this.y + Math.sin(angle) * 100
+                    );
+                }
+            }
+        }, this.shootCooldown);
+    };
+
+    Player.prototype.stopAutoShooting = function() {
+        if (this.autoShootInterval) {
+            clearInterval(this.autoShootInterval);
+            this.autoShootInterval = null;
+        }
+    };
+
+    Player.prototype.findNearestEnemy = function() {
+        if (this.game.enemies.length === 0) return null;
+        
+        let nearest = null;
+        let minDistance = Infinity;
+        
+        this.game.enemies.forEach(enemy => {
+            const dx = enemy.x - this.x;
+            const dy = enemy.y - this.y;
+            const distance = dx * dx + dy * dy;
+            
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearest = enemy;
+            }
+        });
+        
+        return nearest;
+    };
+
     window.Player = Player;
 })();

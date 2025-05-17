@@ -1,7 +1,23 @@
 (function() {
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('Game initialized');
-        
+        function requestFullscreen() {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+        }
+
+        if (window.Telegram && window.Telegram.WebApp) {
+            Telegram.WebApp.ready();
+            Telegram.WebApp.expand();
+            requestFullscreen();
+            Telegram.WebApp.setHeaderColor('#222');
+            Telegram.WebApp.setBackgroundColor('#222');
+        }
+
         const startGameBtn = document.getElementById('startGameBtn');
         const mainMenuBtn = document.getElementById('mainMenuBtn');
         const mainMenu = document.getElementById('mainMenu');
@@ -11,7 +27,6 @@
         let gameInstance = null;
 
         function startNewGame() {
-            console.log('Starting new game');
             mainMenu.classList.remove('visible');
             gameScreen.classList.add('visible');
             gameInstance = new Game();
@@ -19,7 +34,6 @@
         }
 
         function returnToMainMenu() {
-            console.log('Returning to main menu');
             gameOverlay.classList.remove('visible');
             gameScreen.classList.remove('visible');
             mainMenu.classList.add('visible');
@@ -32,13 +46,6 @@
         startGameBtn.addEventListener('click', startNewGame);
         mainMenuBtn.addEventListener('click', returnToMainMenu);
         
-        // Показываем главное меню при загрузке
         mainMenu.classList.add('visible');
-        
-        // Для Telegram
-        if (window.Telegram && window.Telegram.WebApp) {
-            Telegram.WebApp.setHeaderColor('#222');
-            Telegram.WebApp.setBackgroundColor('#222');
-        }
     });
 })();
