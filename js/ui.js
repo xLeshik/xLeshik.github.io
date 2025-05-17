@@ -1,16 +1,21 @@
 export function initUI(game) {
     const pauseBtn = document.getElementById('pauseBtn');
     const resumeBtn = document.getElementById('resumeBtn');
+    const mainMenuBtn = document.getElementById('mainMenuBtn');
     const gameOverlay = document.getElementById('gameOverlay');
 
     pauseBtn.addEventListener('click', () => {
         game.gamePaused = !game.gamePaused;
-        gameOverlay.style.display = game.gamePaused ? 'flex' : 'none';
+        gameOverlay.classList.toggle('hidden', !game.gamePaused);
     });
 
     resumeBtn.addEventListener('click', () => {
         game.gamePaused = false;
-        gameOverlay.style.display = 'none';
+        gameOverlay.classList.add('hidden');
+    });
+
+    mainMenuBtn.addEventListener('click', () => {
+        gameOverlay.classList.add('hidden');
     });
 }
 

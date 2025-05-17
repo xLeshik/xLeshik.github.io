@@ -9,60 +9,37 @@
     <title>Archero Game</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="manifest" href="manifest.json">
-    <style>
-        .preloader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #222;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-size: 20px;
-            z-index: 9999;
-            flex-direction: column;
-        }
-        .loading-bar {
-            width: 200px;
-            height: 20px;
-            background: #444;
-            margin-top: 20px;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-        .loading-progress {
-            height: 100%;
-            background: #4CAF50;
-            width: 0%;
-            transition: width 0.3s;
-        }
-    </style>
 </head>
 <body>
     <div class="preloader">
-        <div>Loading game assets...</div>
+        <img src="images/Loading.png" alt="Loading" class="loading-image">
         <div class="loading-bar">
             <div class="loading-progress" id="loadingProgress"></div>
         </div>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
-    <div id="health">Health: 100</div>
-    <div id="score">Score: 0</div>
-    <button id="pauseBtn">Pause</button>
+    <div id="mainMenu" class="screen">
+        <img src="images/backmain.png" class="background-image">
+        <button id="startGameBtn" class="menu-btn">В БОЙ</button>
+    </div>
+
+    <div id="gameScreen" class="screen hidden">
+        <canvas id="gameCanvas"></canvas>
+        <div id="health">Health: 100</div>
+        <div id="score">Score: 0</div>
+        <button id="pauseBtn">Pause</button>
+    </div>
     
-    <div id="gameOverlay">
-        <button id="resumeBtn" class="pause-btn">Resume Game</button>
+    <div id="gameOverlay" class="screen hidden">
+        <div class="overlay-content">
+            <button id="resumeBtn" class="pause-btn">Resume Game</button>
+            <button id="mainMenuBtn" class="pause-btn">Main Menu</button>
+        </div>
     </div>
     
     <div id="joystickOuter">
         <div id="joystickInner"></div>
     </div>
-    
-    <div class="no-joystick-zone"></div>
 
     <script type="module" src="js/main.js"></script>
 </body>

@@ -2,7 +2,6 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
-    background: #222;
     font-family: Arial, sans-serif;
     touch-action: none;
     position: fixed;
@@ -11,9 +10,83 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.background-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+}
+
+/* Preloader Styles */
+.preloader {
+    background: #222;
+    color: white;
+    z-index: 9999;
+    flex-direction: column;
+}
+
+.loading-image {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 20px;
+}
+
+.loading-bar {
+    width: 200px;
+    height: 20px;
+    background: #444;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.loading-progress {
+    height: 100%;
+    background: #4CAF50;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* Main Menu Styles */
+#mainMenu {
+    z-index: 10;
+}
+
+.menu-btn {
+    padding: 15px 30px;
+    font-size: 24px;
+    background: #ff5722;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    z-index: 11;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}
+
+/* Game Screen Styles */
+#gameScreen {
+    justify-content: flex-start;
+}
+
 canvas {
     display: block;
-    background: #111;
     width: 100%;
     height: 100%;
 }
@@ -50,9 +123,40 @@ canvas {
     border-radius: 5px;
     cursor: pointer;
     z-index: 1001;
-    white-space: nowrap;
 }
 
+/* Game Overlay Styles */
+#gameOverlay {
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 1002;
+}
+
+.overlay-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.pause-btn {
+    padding: 12px 24px;
+    font-size: 20px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+#resumeBtn {
+    background: #4CAF50;
+    color: white;
+}
+
+#mainMenuBtn {
+    background: #ff5722;
+    color: white;
+}
+
+/* Joystick Styles */
 #joystickOuter {
     position: absolute;
     width: 100px;
@@ -75,60 +179,4 @@ canvas {
     left: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
-}
-
-.no-joystick-zone {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100px;
-    z-index: 20;
-}
-
-#gameOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    z-index: 1002;
-}
-
-.pause-btn {
-    padding: 12px 24px;
-    margin: 10px;
-    font-size: 20px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-#resumeBtn {
-    background: #4CAF50;
-    color: white;
-}
-
-.preloader {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: #222;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    font-size: 20px;
-    z-index: 9999;
-}
-
-.preloader.hidden {
-    display: none;
 }
