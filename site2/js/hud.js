@@ -1,9 +1,17 @@
-export function updateHUD(player, time) {
-    document.getElementById('health-value').textContent = Math.floor(player.health);
-    document.getElementById('timer-value').textContent = Math.ceil(time);
-    document.getElementById('weapon-name').textContent = 
-        player.currentWeapon.charAt(0).toUpperCase() + 
-        player.currentWeapon.slice(1);
+// Получаем элементы HUD один раз при загрузке
+const healthElement = document.getElementById('health-value');
+const timerElement = document.getElementById('timer-value');
+const weaponElement = document.getElementById('weapon-name');
+const scoreElement = document.getElementById('score-value');
+
+export function updateHUD(player, time, score = 0, level = 1) {
+    if (healthElement) healthElement.textContent = Math.floor(player.health);
+    if (timerElement) timerElement.textContent = Math.ceil(time);
+    if (weaponElement) {
+        weaponElement.textContent = player.currentWeapon.charAt(0).toUpperCase() + 
+                                  player.currentWeapon.slice(1);
+    }
+    if (scoreElement) scoreElement.textContent = score;
 }
 
 export function showLevelComplete(level) {
@@ -16,14 +24,19 @@ export function showLevelComplete(level) {
     `;
 }
 
-export function showGameOver() {
+export function showGameOver(score) {
     const overlay = createOverlay();
     overlay.innerHTML = `
         <div class="game-over">
             <h2>GAME OVER</h2>
-            <button onclick="window.location.reload()">Try Again</button>
+            <p>Your score: ${score}</p>
+            <button id="restart-btn">Try Again</button>
         </div>
     `;
+    
+    document.getElementById('restart-btn').addEventListener('click', () => {
+        window.location.reload();
+    });
 }
 
 function createOverlay() {
@@ -42,6 +55,7 @@ function createOverlay() {
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-direction: column;
             z-index: 1000;
         `;
         document.body.appendChild(overlay);

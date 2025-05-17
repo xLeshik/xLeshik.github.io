@@ -1,10 +1,11 @@
 export default class Player {
     constructor(canvas) {
         this.canvas = canvas;
-        this.position = {
+        this.initialPosition = {
             x: 100,
             y: canvas.height - 100
         };
+        this.position = {...this.initialPosition};
         this.velocity = { x: 0, y: 0 };
         this.size = { width: 40, height: 60 };
         this.speed = 5;
@@ -14,7 +15,14 @@ export default class Player {
         this.maxHealth = 100;
         this.isGrounded = false;
         this.currentWeapon = 'pistol';
-        this.direction = 1; // 1 - вправо, -1 - влево
+        this.direction = 1;
+    }
+
+    // Добавляем метод resetPosition
+    resetPosition() {
+        this.position = {...this.initialPosition};
+        this.velocity = { x: 0, y: 0 };
+        this.isGrounded = false;
     }
 
     move(direction) {
@@ -33,11 +41,13 @@ export default class Player {
 
     takeDamage(amount) {
         this.health = Math.max(0, this.health - amount);
-        if (this.health === 0) this.die();
+        if (this.health === 0) {
+            this.die();
+        }
     }
 
     die() {
-        // Обработка смерти игрока
+        this.game.endLevel(false);
     }
 
     update() {
@@ -64,7 +74,7 @@ export default class Player {
     }
 
     draw(ctx) {
-        ctx.fillStyle = '#00f';
+        ctx.fillStyle = this.direction > 0 ? '#0000ff' : '#000099';
         ctx.fillRect(
             this.position.x, 
             this.position.y, 

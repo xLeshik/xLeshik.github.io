@@ -82,7 +82,12 @@ export default class Game {
         this.bullets = [];
         this.bonuses = [];
         this.bossSpawned = false;
-        this.player.resetPosition();
+        this.player.position = {
+    x: 100,
+    y: this.canvas.height - this.player.size.height - 50
+};
+this.player.velocity = { x: 0, y: 0 };
+this.player.isGrounded = false;
         
         // Настройка таймеров
         this.setupTimers();
@@ -158,6 +163,8 @@ export default class Game {
 
     // Обновление игрового состояния
     update() {
+        if (!this.player) return;
+
         // Обновление игрока
         this.player.update();
         
@@ -230,6 +237,7 @@ export default class Game {
 
     // Отрисовка игры
     render() {
+        if (!this.player) return;
         // Очистка экрана
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         

@@ -13,15 +13,37 @@ body {
 }
 
 .hud {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    color: #fff;
-    font-family: 'Arial', sans-serif;
-    z-index: 100;
-    background: rgba(0,0,0,0.7);
-    padding: 10px;
+    /* предыдущие стили */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.score {
+    color: #ffcc00;
+    font-weight: bold;
+}
+
+/* Стили для оверлея */
+.level-complete, .game-over {
+    text-align: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#restart-btn {
+    background: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    margin-top: 20px;
     border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
 }
 
 .health-bar, .timer, .weapon-info {
