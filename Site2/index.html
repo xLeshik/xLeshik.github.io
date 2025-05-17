@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Telegram Contra</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="hud">
+        <div class="health-bar">
+            <span id="health-value">100</span>HP
+        </div>
+        <div class="timer">
+            TIME: <span id="timer-value">60</span>
+        </div>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+    
+    <div class="controls">
+        <div class="control-btn left">←</div>
+        <div class="control-btn jump">↑</div>
+        <div class="control-btn right">→</div>
+        <div class="control-btn shoot">⚡</div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

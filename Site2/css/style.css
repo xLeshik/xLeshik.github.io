@@ -1,0 +1,58 @@
+body {
+    margin: 0;
+    overflow: hidden;
+    background: #000;
+    touch-action: none;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+#gameCanvas {
+    background: #1a1a1a;
+}
+
+.hud {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    z-index: 100;
+    background: rgba(0,0,0,0.7);
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.health-bar, .timer, .weapon-info {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.controls {
+    position: fixed;
+    bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    box-sizing: border-box;
+    touch-action: manipulation;
+}
+
+.control-btn {
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-size: 24px;
+    transition: background 0.2s;
+}
+
+.control-btn:active {
+    background: rgba(255,255,255,0.5);
+}
